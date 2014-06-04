@@ -69,7 +69,6 @@ solution[0,1]=bc1
 solution[node-1,1]=bc2
 for j in range(1,node-1):
     solution[j,1]=(0.5)*((scipy.exp(solution[j,0]*exp)*scipy.special.erfc((solution[j,0]*erfc1)+(erfc2))+(scipy.exp(-solution[j,0]*exp)*scipy.special.erfc((solution[j,0]*erfc1)-(erfc2)))))
-    print solution[j,1],j
 # end j
 #######
 #
