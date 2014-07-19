@@ -1,10 +1,11 @@
 ########################################################################
 # R.A.Borrelli
 # @TheDoctorRAB
-# rev.21.June.2014
+# rev.19.July.2014
 ########################################################################
 # This contains functions for matrix algebra.
 # With the overall goal of computing a matrix inverse.
+# This routine uses the minimum number of operations.
 # This is for a sparse, square tri band matrix only.
 # The matrix is positive definite by definition.
 # This can be usefule for the finite element method. 
@@ -73,9 +74,6 @@ def matrix_storage(node,main_matrix):
 # and only nonzeros should be stored
 # the inverse of D is needed, but this is simple to compute
 ###
-# 
-# 
-###
 #
 ###
 def matrix_factorization(node,storage_matrix):
@@ -84,7 +82,7 @@ def matrix_factorization(node,storage_matrix):
     l_factor=numpy.zeros((node-1))
     d_factor=numpy.zeros((node))
     u_factor=numpy.zeros((node-1))
-#
+# initialize inverse of D
     inverse_d=numpy.zeros((node))
 ###
 # compute the diagonal factor
@@ -105,13 +103,50 @@ def matrix_factorization(node,storage_matrix):
         u_factor[j]=storage_matrix[j,1]/d_factor[j]
 ###
 # compute the diagonal inverse
-    
-        
-    return()    
+    for k in range(0,node):
+        inverse_d[k]=d_factor[k]**(-1)
+# end k
+###        
+    return(l_factor,d_factor,u_factor,inverse_d)    
 ########################################################################
 #
 #    
 #
+####### inverse
+# the inversion of the matrix sparse matrix is a recursive scheme
+# starting with the nn element
+# even though the original matrix is sparse
+# the inverse will be n x n with no zero elements
+###
+#
+###
+def invert_matrix(node,l_factor,d_factor,u_factor,inverse_d):
+###
+# initialize inverse matrix
+    inverse_matrix=numpy.zeros((node,node))
+###
+# compute the nn element
+    inverse_matrix[node-1,node-1]=inverse_d[node-1]
+###
+# and the rest
+    for i in range(node-2,-1,-1):
+# node level row
+        inverse_matrix[node-1,i]=(-1)*inverse_matrix[node-1,i+1]*l_factor[i]
+        for j in range (i,-1,-1):
+            if j==i:
+# diagonal
+                inverse_matrix[j,j]=d_factor[j]**(-1)-u_factor[j]*inverse_matrix[j+1,j]
+            else:
+# lower triangular by row
+                inverse_matrix[i,j]=-(1)*inverse_matrix[i,j+1]*l_factor[j]
+# upper triangular by column
+            inverse_matrix[j,i+1]=(-1)*u_factor[j]*inverse_matrix[j+1,i+1]
+# end j
+# end i
+###
+# 
+###
+    return(inverse_matrix)
 ########################################################################
 #      EOF
 ########################################################################
