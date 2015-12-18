@@ -33,6 +33,8 @@ matplotlib.rcParams.update({'font.size': 16}) #set plot font
 width=GetSystemMetrics (0)
 height=GetSystemMetrics (1)
 #
+#######
+#
 # input data
 #
 domain_x=10 #success domain
